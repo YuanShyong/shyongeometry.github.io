@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yuan Shyong Ooi | Differential Geometry</title>
+    <!-- MathJax for rendering Math formulas -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* --- ACADEMIC THEME VARIABLES --- */
+        :root {
+            /* A professional 'Slate' dark theme */
+            --bg-color: #1e2024;        
+            --sidebar-bg: #16181b;
+            --text-main: #e6e6e6;
+            --text-muted: #a0a0a0;
+            --accent-color: #4da6ff;     /* Academic Blue */
+            --border-color: rgba(255, 255, 255, 0.1);
+            
+            /* Typography: Serif for headings (LaTeX style), Sans for UI */
+            --font-heading: 'Georgia', 'Times New Roman', Times, serif;
+            --font-body: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* --- RESET & BASICS --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            line-height: 1.7;
+            overflow-x: hidden;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- BACKGROUND CANVAS --- */
+        #geo-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            /* Subtle radial gradient to focus attention on center */
+            background: radial-gradient(circle at center, #25282e 0%, #16181b 100%);
+        }
+
+        /* --- SIDEBAR NAVIGATION --- */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .profile-section h1 {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .profile-section p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 15px;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 1.05rem;
+            transition: 0.3s;
+            display: block;
+            padding: 5px 0;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--accent-color);
+            transform: translateX(5px);
+        }
+
+        .contact-mini {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .contact-mini a {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .contact-mini a:hover { color: var(--accent-color); }
+
+        /* --- MAIN CONTENT AREA --- */
+        .main-content {
+            margin-left: 280px; /* Width of sidebar */
+            padding: 60px 80px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        section {
+            margin-bottom: 80px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h2 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            color: #fff;
+        }
+
+        h3 {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: var(--accent-color); /* Highlight subheaders */
+        }
+
+        p { margin-bottom: 15px; }
+
+        a.text-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--accent-color);
+        }
+        a.text-link:hover { border-bottom-style: solid; }
+
+        /* --- PUBLICATIONS LIST STYLE --- */
+        .pub-list {
+            list-style: none;
+        }
+        .pub-item {
+            margin-bottom: 25px;
+            padding-left: 20px;
+            border-left: 2px solid var(--border-color);
+        }
+        .pub-title {
+            font-weight: bold;
+            display: block;
+            color: #f0f0f0;
+        }
+        .pub-authors {
+            font-size: 0.95rem;
+            color: #ccc;
+        }
+        .pub-journal {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* --- PROFILE PHOTO STYLES --- */
+        .about-container {
+            display: flex; /* Puts text and image side-by-side */
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .about-text {
+            flex: 1; /* Text takes up remaining space */
+        }
+
+        .profile-photo {
+            width: 200px;      /* Fixed width */
+            height: 200px;     /* Fixed height */
+            object-fit: cover; /* Ensures image doesn't stretch weirdly */
+            border-radius: 50%; /* Makes it a circle */
+            border: 3px solid var(--accent-color); /* Blue border */
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* On mobile, stack them vertically */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 30px;
+                border-bottom: 1px solid var(--border-color);
+                border-right: none;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 40px 20px;
+            }
+            .nav-links { display: flex; gap: 20px; flex-wrap: wrap; }
+            .contact-mini { display: none; } /* Hide mini contact on mobile header */
+            .about-container {
+                flex-direction: column-reverse; /* Put image on top of text on mobile */
+                align-items: center;
+                text-align: center;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- GEOMETRIC CANVAS BACKGROUND -->
+    <canvas id="geo-canvas"></canvas>
+
+    <!-- SIDEBAR (Fixed Left) -->
+    <nav class="sidebar">
+        <div class="profile-section">
+            <h1>Yuan Shyong Ooi</h1>
+            <p>Postdoctoral Fellow<br>National Center for Theoretical Sciences (NCTS)</p>
+            
+            <ul class="nav-links">
+                <li><a href="#about" class="active">About</a></li>
+                <li><a href="#research">Research</a></li>
+                <li><a href="#publications">Publications</a></li>
+                <li><a href="#teaching">Teaching</a></li>
+                <li><a href="#misc">Misc. Links</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+
+        <div class="contact-mini">
+            <div>Taipei, Taiwan</div>
+            <a href="mailto:yuanshyong@ncts.ntu.edu.tw">yuanshyong@ncts.ntu.edu.tw</a>
+            <a href="https://github.com/yuanshyong" target="_blank">GitHub Profile &rarr;</a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT (Scrollable Right) -->
+    <main class="main-content">
+        
+       <!-- ABOUT SECTION -->
+        <section id="about">
+            <h2>About Me</h2>
+            
+            <div class="about-container">
+                <!-- The Text Side -->
+                <div class="about-text">
+                    <p>
+                        My family name is Ooi, and Yuan Shyong is my given name. Born and raised in Malaysia, I’ve embarked on an academic journey that has taken me from the University of Science, Malaysia to the esteemed halls of National Taiwan University, where I’ve completed both my M.Sc. and Ph.D. under the guidance of my advisor <a href="https://www.genealogy.math.ndsu.nodak.edu/id.php?id=39253" class="text-link" target="_blank">Yng-Ing Lee</a>. My drive for unveiling mathematical truths within Differential Geometry especially in minimal subamanifold theory spurs my daily endeavors in both teaching and research.
+                    </p>
+                    <p>
+                        I embraced the post of Postdoctoral Fellow at National Taiwan University from October 2020 to July 2021. From August 2021 to Feb 2024, I have been dedicated to my research as a Postdoctoral Fellow at Pusan National University within the Basic Research Laboratory <a href="https://sites.google.com/view/geometrybrl/people?authuser=0" class="text-link" target="_blank">BRL</a>, under my host <a href="https://scholar.google.com/citations?user=RrX0fsEAAAAJ&hl=ko" class="text-link" target="_blank">Juncheol Pyo</a> where my work continues to push the boundaries of geometric analysis. Currently I am doing my postdoc at National Center for Theoretical Science <a href="https://ncts.ntu.edu.tw/" class="text-link" target="_blank">NCTS</a>.
+                    </p>
+                </div>
+
+                <!-- The Image Side -->
+                <!-- Ensure you have a file named 'profile.jpg' in the same folder, or change this link -->
+                <img src="profile.jpg" alt="Yuan Shyong Ooi" class="profile-photo">
+            </div>
+        </section>
+
+        <!-- RESEARCH INTERESTS -->
+        <section id="research">
+            <h2>Research Interests</h2>
+            <p>I delve into the intriguing world of <strong>Differential Geometry</strong>. My research focuses on the following key areas:</p>
+            
+            <!-- Category 1 -->
+            <div style="margin-top: 30px;">
+                <h3>1. Minimal Submanifolds</h3>
+                <ul style="margin-left: 20px; line-height: 1.8;">
+                    <li>Higher codimension minimal submanifold problems.</li>
+                    <li>Classical minimal hypersurface Bernstein-type problems.</li>
+                    <li>Graphical minimal submanifolds (minimal surface systems).</li>
+                    <li>Dirichlet problems, including existence, regularity, stability, and uniqueness issues.</li>
+                </ul>
+            </div>
+
+            <!-- Category 2 -->
+            <div style="margin-top: 30px;">
+                <h3>2. Geometric Flow</h3>
+                <ul style="margin-left: 20px; line-height: 1.8;">
+                    <li>Self-similar solutions of Mean Curvature Flow (MCF).</li>
+                    <li>Rigidity and classification of Mean Curvature Flow soliton solutions.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- PUBLICATIONS SECTION -->
+        <section id="publications">
+            <h2>Publications & Preprints</h2>
+            <ul class="pub-list">
+                
+                <!-- PAPER 1 -->
+                <li class="pub-item">
+                    <span class="pub-title">Rigidity results for graphical translators for the mean curvature flow moving in non-graphical direction</span>
+                    <span class="pub-authors">with John Ma Man Shun and Juncheol Pyo</span>
+                    <br>
+                    <span class="pub-journal">Proceedings of the American Mathematical Society 151.12 (2023): 5391-5402.</span>
+                    <br>
+                    <!-- UPDATE HERE: Ensure you have a 'papers' folder with this file inside -->
+                    <a href="papers/rigidity_results.pdf" class="text-link" target="_blank">[PDF Download]</a>
+                </li>
+
+                <!-- PAPER 2 -->
+                <li class="pub-item">
+                    <span class="pub-title">Higher codimension minimal submanifold with isolated singularity</span>
+                    <span class="pub-authors">Yuan Shyong Ooi</span>
+                    <br>
+                    <span class="pub-journal">Journal of Geometric Analysis 32, no.5, Paper No. 164, 30 pp (2022)</span>
+                    <br>
+                    <a href="papers/isolated_singularity.pdf" class="text-link" target="_blank">[PDF Download]</a>
+                </li>
+
+                <!-- PAPER 3 -->
+                <li class="pub-item">
+                    <span class="pub-title">Uniqueness of Minimal Graph in General Codimension</span>
+                    <span class="pub-authors">with Yng-Ing Lee and Mao-Pei Tsui</span>
+                    <br>
+                    <span class="pub-journal">Journal of Geometric Analysis 29, 1211–1233 (2019)</span>
+                    <br>
+                    <a href="papers/uniqueness_minimal_graph.pdf" class="text-link" target="_blank">[PDF Download]</a>
+                </li>
+
+                <!-- PREPRINTS -->
+                 <li class="pub-item">
+                    <span class="pub-title">Stability properties and rigidity results of A-translating hypersurfaces</span>
+                    <span class="pub-authors">with Jihyeon Lee</span>
+                    <br>
+                    <span class="pub-journal">Submitted</span>
+                    <br>
+                </li>
+
+            </ul>
+        </section>
+
+        <!-- TEACHING / TALKS SECTION -->
+        <section id="teaching">
+            <h2>Teaching & Talks</h2>
+            
+            <h3>Recent & Upcoming Talks</h3>
+            <ul style="list-style: none; margin-bottom: 30px;">
+                 <li style="margin-bottom: 8px;"><strong>Nov 2025:</strong> The 5th Japan-Taiwan Joint Conference on Differential Geometry</li>
+                 <li style="margin-bottom: 8px;"><strong>March 2025:</strong> NTHU Geometry Seminar</li>
+                 <li style="margin-bottom: 8px;"><strong>Aug 2024:</strong> NCTS: Young Geometric Analysts Forum</li>
+                 <li style="margin-bottom: 8px;"><strong>April 2024:</strong> Academia Sinica and NCTS: Taipei Postdoc Seminar</li>
+            </ul>
+
+            <h3>Academic Experience</h3>
+            <p>
+                <strong>National Taiwan University (NTU)</strong><br>
+                <em>Instructor</em> (2024 - 2025): Calculus 1 & 2, Multivariable Calculus, Vector Calculus.
+            </p>
+            <p>
+                <strong>Pusan National University (PNU)</strong><br>
+                <em>Co-Lecturer</em> (2023 - 2024): Graduate course on Geometric Measure Theory (in English).
+            </p>
+        </section>
+
+        <!-- MISC LINKS SECTION (New) -->
+        <section id="misc">
+            <h2>Misc. Links</h2>
+            <ul style="list-style: none; padding-left: 20px;">
+                <li style="margin-bottom: 12px;">
+                    <!-- ACTION ITEM: Rename your CV file to 'cv.pdf' and put it in the same folder as index.html -->
+                    <a href="cv.pdf" class="text-link" target="_blank"><strong>Download Personal CV (PDF)</strong></a>
+                </li>
+                <li style="margin-bottom: 12px;">
+                    <a href="https://arxiv.org/search/?query=Ooi%2C+Yuan+Shyong&searchtype=author" class="text-link" target="_blank">ArXiv Articles</a>
+                </li>
+                <li style="margin-bottom: 12px;">
+                    <!-- ACTION ITEM: Replace the # with your actual Google Scholar profile URL -->
+                    <a href="https://scholar.google.com.tw/citations?user=v3hHG8gAAAAJ&hl=zh-CN" class="text-link" target="_blank">Google Scholar Profile</a>
+                </li>
+                <li style="margin-bottom: 12px;">
+                    <a href="https://mathscinet.ams.org/mathscinet" class="text-link" target="_blank">MathSciNet</a>
+                </li>
+                <li style="margin-bottom: 12px;">
+                    <a href="https://www.mathcha.io" class="text-link" target="_blank">MathCha(Plotting)</a>
+                </li>
+            </ul>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section id="contact">
+            <h2>Contact</h2>
+            <div style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 5px;">
+                <p><strong>Affiliation:</strong><br> National Center for Theoretical Sciences (NCTS)</p>
+                <p><strong>Email:</strong><br> <a href="mailto:yuanshyong@ncts.ntu.edu.tw" class="text-link">yuanshyong@ncts.ntu.edu.tw</a><br>
+                <a href="mailto:shyong224@gmail.com" class="text-link" style="font-size: 0.9em; opacity: 0.8;">shyong224@gmail.com (Permanent)</a></p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JAVASCRIPT: The Geometric Canvas Logic -->
+    <script>
+        const canvas = document.getElementById('geo-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // --- ACADEMIC SETTINGS FOR PARTICLES ---
+        // Slower, fewer, more subtle (like vertices in a graph)
+        const SETTINGS = {
+            count: 60,              // Fewer particles for a clean look
+            distance: 140,          // Connection distance
+            speed: 0.3,             // Very slow, contemplative movement
+            size: 1.5,              // Small, precise dots
+            color: 'rgba(77, 166, 255,', // Academic Blue (matches accent)
+        };
+
+        let particles = [];
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Resize Handling
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * SETTINGS.speed;
+                this.vy = (Math.random() - 0.5) * SETTINGS.speed;
+                this.size = Math.random() * SETTINGS.size + 1;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Bounce off edges
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = SETTINGS.color + '0.5)';
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            particles = [];
+            for (let i = 0; i < SETTINGS.count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                // Draw Connections (Geometric Lines)
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < SETTINGS.distance) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = SETTINGS.color + (1 - dist/SETTINGS.distance) * 0.2 + ')'; // Low opacity lines
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+    </script>
+</body>
+</html>
