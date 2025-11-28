@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yuan Shyong Ooi | Differential Geometry</title>
+    
+    <!-- ADDED: MathJax Configuration to enable $ for inline math -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
     <!-- MathJax for rendering Math formulas -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
@@ -45,7 +54,8 @@
             z-index: -1;
             /* Subtle radial gradient to focus attention on center */
             background: radial-gradient(circle at center, #25282e 0%, #16181b 100%);
-            cursor: crosshair; /* Adds a subtle hint that it's interactive */
+            /* ADDED: Crosshair cursor to hint at interaction */
+            cursor: crosshair; 
         }
 
         /* --- SIDEBAR NAVIGATION --- */
@@ -201,7 +211,7 @@
             transform: scale(1.05) rotate(2deg); /* Subtle playful interaction */
         }
 
-        /* Fun Element Hint Style */
+        /* ADDED: Fun Element Hint Style */
         .fun-hint {
             font-size: 0.75rem; 
             color: var(--accent-color); 
@@ -260,7 +270,7 @@
                 <li><a href="#contact">Contact</a></li>
             </ul>
 
-            <!-- New Interactive Hint -->
+            <!-- ADDED: New Interactive Hint -->
             <div class="fun-hint">
                 ✨ Click background to create nodes
             </div>
@@ -388,7 +398,7 @@
             </p>
             <p>
                 <strong>Pusan National University (PNU)</strong><br>
-                <em>Co-Lecturer</em> (2023 - 2024): Graduate course on Geometric Measure Theory.
+                <em>Co-Lecturer</em> (2023 - 2024): Graduate course on Geometric Measure Theory (in English).
             </p>
         </section>
 
@@ -452,7 +462,7 @@
             init();
         });
 
-        // --- NEW: INTERACTIVE MOUSE BURST ---
+        // --- ADDED: INTERACTIVE MOUSE BURST ---
         // When user clicks, add particles that explode outward
         window.addEventListener('mousedown', (e) => {
             const burstAmount = 8;
