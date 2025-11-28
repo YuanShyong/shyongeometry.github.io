@@ -45,6 +45,7 @@
             z-index: -1;
             /* Subtle radial gradient to focus attention on center */
             background: radial-gradient(circle at center, #25282e 0%, #16181b 100%);
+            cursor: crosshair; /* Adds a subtle hint that it's interactive */
         }
 
         /* --- SIDEBAR NAVIGATION --- */
@@ -193,6 +194,20 @@
             border-radius: 50%; /* Makes it a circle */
             border: 3px solid var(--accent-color); /* Blue border */
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transition: transform 0.5s ease; /* For hover effect */
+        }
+
+        .profile-photo:hover {
+            transform: scale(1.05) rotate(2deg); /* Subtle playful interaction */
+        }
+
+        /* Fun Element Hint Style */
+        .fun-hint {
+            font-size: 0.75rem; 
+            color: var(--accent-color); 
+            opacity: 0.7; 
+            margin-top: 20px;
+            font-style: italic;
         }
 
         /* On mobile, stack them vertically */
@@ -244,6 +259,11 @@
                 <li><a href="#misc">Misc. Links</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
+
+            <!-- New Interactive Hint -->
+            <div class="fun-hint">
+                ✨ Click background to create nodes
+            </div>
         </div>
 
         <div class="contact-mini">
@@ -272,7 +292,6 @@
                 </div>
 
                 <!-- The Image Side -->
-                <!-- Ensure you have a file named 'profile.jpg' in the same folder, or change this link -->
                 <img src="profile.jpg" alt="Yuan Shyong Ooi" class="profile-photo">
             </div>
         </section>
@@ -315,7 +334,6 @@
                     <br>
                     <span class="pub-journal">Proceedings of the American Mathematical Society 151.12 (2023): 5391-5402.</span>
                     <br>
-                    <!-- UPDATE HERE: Ensure you have a 'papers' folder with this file inside -->
                     <a href="papers/rigidity_results.pdf" class="text-link" target="_blank">[PDF Download]</a>
                 </li>
 
@@ -374,19 +392,17 @@
             </p>
         </section>
 
-        <!-- MISC LINKS SECTION (New) -->
+        <!-- MISC LINKS SECTION -->
         <section id="misc">
             <h2>Misc. Links</h2>
             <ul style="list-style: none; padding-left: 20px;">
                 <li style="margin-bottom: 12px;">
-                    <!-- ACTION ITEM: Rename your CV file to 'cv.pdf' and put it in the same folder as index.html -->
                     <a href="cv.pdf" class="text-link" target="_blank"><strong>Download Personal CV (PDF)</strong></a>
                 </li>
                 <li style="margin-bottom: 12px;">
                     <a href="https://arxiv.org/search/?query=Ooi%2C+Yuan+Shyong&searchtype=author" class="text-link" target="_blank">ArXiv Articles</a>
                 </li>
                 <li style="margin-bottom: 12px;">
-                    <!-- ACTION ITEM: Replace the # with your actual Google Scholar profile URL -->
                     <a href="https://scholar.google.com.tw/citations?user=v3hHG8gAAAAJ&hl=zh-CN" class="text-link" target="_blank">Google Scholar Profile</a>
                 </li>
                 <li style="margin-bottom: 12px;">
@@ -416,7 +432,6 @@
         const ctx = canvas.getContext('2d');
 
         // --- ACADEMIC SETTINGS FOR PARTICLES ---
-        // Slower, fewer, more subtle (like vertices in a graph)
         const SETTINGS = {
             count: 60,              // Fewer particles for a clean look
             distance: 140,          // Connection distance
@@ -435,6 +450,25 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             init();
+        });
+
+        // --- NEW: INTERACTIVE MOUSE BURST ---
+        // When user clicks, add particles that explode outward
+        window.addEventListener('mousedown', (e) => {
+            const burstAmount = 8;
+            for (let i = 0; i < burstAmount; i++) {
+                const p = new Particle();
+                p.x = e.clientX;
+                p.y = e.clientY;
+                // Give them higher speed to explode outward
+                p.vx = (Math.random() - 0.5) * 4;
+                p.vy = (Math.random() - 0.5) * 4;
+                particles.push(p);
+            }
+            // Limit total particles to prevent lag
+            if (particles.length > 150) {
+                particles.splice(0, burstAmount);
+            }
         });
 
         class Particle {
